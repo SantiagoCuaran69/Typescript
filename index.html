@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Registration</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <div class="container mt-5">
+    <h1>Student Registration</h1>
+    <form id="studentForm">
+      <div class="form-group">
+        <label for="name">Name:</label>
+        <input type="text" class="form-control" id="name" required>
+      </div>
+      <div class="form-group">
+        <label for="age">Age:</label>
+        <input type="number" class="form-control" id="age" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+
+    <table id="studentTable" class="table mt-5">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const apiUrl = 'https://apiestudiantes.maosystems.dev/api/students';
+
+    // Function to fetch and display student data
+    function getStudents() {
+      axios.get(apiUrl)
+        .then(response => {
+          const students = response.data;
+          const tableBody = document.querySelector('#studentTable tbody');
+          tableBody.innerHTML = '';
+
+          students.forEach(student => {
+            const row = `
+              <tr>
+                <td>${student.name}</td>
+                <td>${student.age}</td>
+              </tr>
+            `;
+            tableBody.innerHTML += row;
+          });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+    // Event listener for form submission
+    document.querySelector('#studentForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const name = document.querySelector('#name').value;
+      const age = document.querySelector('#age').value;
+
+      const data = {
+        name: name,
+        age: age
+      };
+
+      axios.post(apiUrl, data)
+        .then(response => {
+          console.log('Student registered successfully!');
+          document.querySelector('#name').value = '';
+          document.querySelector('#age').value = '';
+          getStudents();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    });
+
+    // Initial fetch to populate the table with existing students
+    getStudents();
+  </script>
+</body>
+</html>
